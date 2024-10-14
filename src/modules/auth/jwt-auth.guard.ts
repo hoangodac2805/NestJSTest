@@ -26,22 +26,17 @@ export class AuthGuard implements CanActivate {
           secret: process.env.JWT_SECRET
         }
       );
+      if(!payload) {
+        throw new UnauthorizedException('Access token invalid');
+      }
       const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
-      console.log(payload,requiredRoles);
       if (requiredRoles && !requiredRoles.includes(payload.role)) {
         throw new UnauthorizedException('Insufficient permissions');
       }
-
       request['user'] = payload;
-
-
-
     } catch {
       throw new UnauthorizedException();
     }
-
-
-
     return true;
   }
 

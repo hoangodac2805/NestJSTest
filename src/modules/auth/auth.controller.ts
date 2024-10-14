@@ -1,13 +1,9 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -31,14 +27,20 @@ export class AuthController {
     return this.authService.login(user);
   }
 
-  @Post('refresh-token')
-  async refreshToken(@Body() { refreshToken }: { refreshToken: string }) {
-    const decoded = this.authService.jwtService.verify(refreshToken);
-    return this.authService.refreshTokens(decoded.sub, refreshToken);
-  }
+  @Post('refresh')
+  async refreshToken(@Body('refreshToken') refreshToken: string) {
+    const tokenEntity = await this.authService.getRefreshToken(refreshToken);
+    if (
+      !tokenEntity ||
+      tokenEntity.revoked ||
+      tokenEntity.expiresAt < new Date()
+    ) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
 
-  @Post('protected')
-  protectedRoute(@Req() req) {
-    return { message: 'This is a protected route', user: req.user };
+    const newAccessToken = await this.authService.generateAccessToken(
+      tokenEntity.user,
+    );
+    return { accessToken: newAccessToken, refreshToken: refreshToken };
   }
 }

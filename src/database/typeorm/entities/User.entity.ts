@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, Length, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  MinLength,
+} from 'class-validator';
 import { UserRole } from 'src/enum/index.enum';
 import {
   Entity,
@@ -8,8 +14,10 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Profile } from './Profile.entity';
+import { RefreshToken } from './Refresh-token.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -39,9 +47,9 @@ export class User {
   role: UserRole;
 
   @Column({
-    nullable:true
+    nullable: true,
   })
-  refreshToken: string
+  refreshToken: string;
 
   @Column({ default: true })
   isActive: boolean;
@@ -51,6 +59,9 @@ export class User {
   })
   @JoinColumn()
   profile: Profile;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 
   @CreateDateColumn()
   createdAt: Date;

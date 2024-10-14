@@ -2,6 +2,7 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { User } from './entities/User.entity';
 import { join } from 'path';
 import { Profile } from "./entities/Profile.entity";
+import { RefreshToken } from "./entities/Refresh-token.entity";
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'mysql',
@@ -10,7 +11,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User,Profile],
+    entities: [User,Profile,RefreshToken],
     migrations: [join(__dirname, 'migrations/*.{ts,js}')],
     synchronize: true,
 };

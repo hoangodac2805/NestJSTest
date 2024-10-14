@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,9 +26,10 @@ export class UsersController {
 
 
   @UseGuards(AuthGuard)
-  @Roles('ADMIN','SUPERADMIN')
+  // @Roles('ADMIN','SUPERADMIN')
   @Get()
-  findAll() {
+  findAll(@Request() req) {
+    console.log(req.user)
     return this.usersService.findAll();
   }
 

@@ -22,6 +22,7 @@ export class UsersService {
     return this.usersRepository.find({
       relations: {
         profile: true,
+        refreshTokens:true
       },
     });
   }

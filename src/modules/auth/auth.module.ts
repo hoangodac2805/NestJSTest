@@ -5,13 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/database/typeorm/entities/User.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { RefreshToken } from 'src/database/typeorm/entities/Refresh-token.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User,RefreshToken]),
     JwtModule.register({
       global:true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '2m' },
     }),
   ],
   controllers: [AuthController],
