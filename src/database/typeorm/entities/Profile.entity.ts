@@ -18,13 +18,13 @@ export class Profile {
   @Column()
   @IsString()
   @IsNotEmpty()
-  @Length(4, 25)
+  @Length(1, 25)
   firstName: string;
 
   @Column()
   @IsString()
   @IsNotEmpty()
-  @Length(4, 25)
+  @Length(1, 25)
   lastName: string;
 
   @Column({
