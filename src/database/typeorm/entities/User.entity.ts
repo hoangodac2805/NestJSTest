@@ -27,7 +27,7 @@ export class User {
   @Column()
   @IsString()
   @IsNotEmpty()
-  @Length(4, 25)
+  @Length(1, 25)
   userName: string;
 
   @Column({ unique: true })
@@ -45,11 +45,6 @@ export class User {
     default: UserRole.USER,
   })
   role: UserRole;
-
-  @Column({
-    nullable: true,
-  })
-  refreshToken: string;
 
   @Column({ default: true })
   isActive: boolean;

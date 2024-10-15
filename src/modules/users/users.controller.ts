@@ -20,13 +20,13 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Post()
+
+  @UseGuards(AuthGuard)
+  @Roles('ADMIN','SUPERADMIN')
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-
-  @UseGuards(AuthGuard)
-  // @Roles('ADMIN','SUPERADMIN')
   @Get()
   findAll(@Request() req) {
     console.log(req.user)
@@ -39,6 +39,7 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
+  @Roles('ADMIN','SUPERADMIN')
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -48,6 +49,8 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @Roles('ADMIN','SUPERADMIN')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }

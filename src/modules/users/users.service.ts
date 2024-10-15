@@ -3,26 +3,35 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import { User } from 'src/database/typeorm/entities/User.entity';
+import { HandleDBError } from 'src/common/decorators/handleDBErrors.decorator';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
-  create(createUserDto: CreateUserDto) {
+  @HandleDBError()
+  async create(createUserDto: CreateUserDto) {
+    const { password, ...rest } = createUserDto;
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = this.usersRepository.create({
-      ...createUserDto,
+      ...rest,
+      password: hashedPassword
     });
-    return this.usersRepository.save(newUser);
+    let {profile,email,userName} = await this.usersRepository.save(newUser);
+
+    return {profile,email,userName}
   }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find({
       relations: {
         profile: true,
-        refreshTokens:true
+        refreshTokens: true
       },
     });
   }

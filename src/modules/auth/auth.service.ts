@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/database/typeorm/entities/User.entity';
@@ -7,6 +7,8 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { RefreshToken } from 'src/database/typeorm/entities/Refresh-token.entity';
+import { HandleDBError } from 'src/common/decorators/handleDBErrors.decorator';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,18 +17,19 @@ export class AuthService {
     @InjectRepository(RefreshToken)
     private refreshTokenRepo: Repository<RefreshToken>,
     public jwtService: JwtService,
-  ) {}
+  ) { }
+
+
+  @HandleDBError()
   async register(registerDto: RegisterDto): Promise<User> {
     const { email, password, userName } = registerDto;
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
-
     const user = this.usersRepository.create({
       userName,
       email,
       password: hashedPassword,
     });
-
     await this.usersRepository.save(user);
     return user;
   }
@@ -90,12 +93,4 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(userId: number, refreshToken: string): Promise<any> {
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
-
-    if (!user || user.refreshToken !== refreshToken) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-    return this.login(user);
-  }
 }
