@@ -4,11 +4,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './User.entity';
+import { Message } from './Message.entity';
+import { Avatar } from './Avatar.entity';
 
 @Entity({ name: 'profiles' })
 export class Profile {
@@ -35,6 +39,18 @@ export class Profile {
 
   @OneToOne(() => User, (user) => user.profile)
   user: User;
+
+  @OneToOne(() => Avatar, { cascade: true })
+  @JoinColumn()
+  currentAvatar: Avatar
+
+  @OneToMany(() => Avatar, avatar => avatar.profile, { cascade: true })
+  usedAvatars: Avatar[]
+
+  @OneToMany(() => Message, (message) => message.profile, {
+    cascade: true
+  })
+  messages: Message[]
 
   @CreateDateColumn()
   createdAt: Date;

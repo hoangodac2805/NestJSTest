@@ -6,8 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
-
-import { Request } from 'express';
+import { extractTokenFromHeader } from 'src/common/utilities';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,7 +14,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const token = extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException('Invalid token');
     }
@@ -40,8 +39,8 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
-  }
+  // private extractTokenFromHeader(request: Request): string | undefined {
+  //   const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  //   return type === 'Bearer' ? token : undefined;
+  // }
 }

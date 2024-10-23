@@ -45,7 +45,6 @@ export class AuthService {
 
   async login(user: User) {
     const payload = { email: user.email, sub: user.id, role: user.role };
-
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: await this.generateRefreshToken(user),
@@ -69,6 +68,17 @@ export class AuthService {
     await this.refreshTokenRepo.save(refreshTokenEntity);
 
     return refreshToken;
+  }
+
+
+  async verifyToken(token: string): Promise<any> {
+    try {
+      return this.jwtService.verify(token,
+        {secret:process.env.JWT_SECRET}
+      )
+    } catch (e) {
+      throw new Error('Invalid token');
+    }
   }
 
   async getRefreshToken(token: string): Promise<RefreshToken | null> {
