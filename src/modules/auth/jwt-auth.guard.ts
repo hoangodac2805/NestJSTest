@@ -7,13 +7,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { extractTokenFromHeader } from 'src/common/utilities';
+import { RequestWithUser } from 'src/common/interfaces/request-with-user.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
     const token = extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException('Invalid token');
@@ -32,7 +33,7 @@ export class AuthGuard implements CanActivate {
       if (requiredRoles && !requiredRoles.includes(payload.role)) {
         throw new UnauthorizedException('Insufficient permissions');
       }
-      request['user'] = payload;
+      request.user = payload;
     } catch {
       throw new UnauthorizedException();
     }

@@ -19,15 +19,14 @@ export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+  })
   @IsString()
-  @IsNotEmpty()
   @Length(1, 25)
   firstName: string;
 
   @Column()
   @IsString()
-  @IsNotEmpty()
   @Length(1, 25)
   lastName: string;
 
@@ -42,15 +41,15 @@ export class Profile {
 
   @OneToOne(() => Avatar, { cascade: true })
   @JoinColumn()
-  currentAvatar: Avatar
+  currentAvatar: Avatar;
 
-  @OneToMany(() => Avatar, avatar => avatar.profile, { cascade: true })
-  usedAvatars: Avatar[]
+  @OneToMany(() => Avatar, (avatar) => avatar.profile, { cascade: true })
+  usedAvatars: Avatar[];
 
   @OneToMany(() => Message, (message) => message.profile, {
-    cascade: true
+    cascade: true,
   })
-  messages: Message[]
+  messages: Message[];
 
   @CreateDateColumn()
   createdAt: Date;

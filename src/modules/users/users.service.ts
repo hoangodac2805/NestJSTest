@@ -6,12 +6,14 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/database/typeorm/entities/User.entity';
 import { HandleDBError } from 'src/common/decorators/handleDBErrors.decorator';
+import { FirebaseService } from 'src/firebase/firebase.service';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) { }
+    private firebaseService: FirebaseService,
+  ) {}
 
   @HandleDBError()
   async create(createUserDto: CreateUserDto) {
@@ -20,18 +22,18 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = this.usersRepository.create({
       ...rest,
-      password: hashedPassword
+      password: hashedPassword,
     });
-    let {profile,email,userName} = await this.usersRepository.save(newUser);
+    let { profile, email, userName } = await this.usersRepository.save(newUser);
 
-    return {profile,email,userName}
+    return { profile, email, userName };
   }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find({
       relations: {
         profile: true,
-        refreshTokens: true
+        refreshTokens: true,
       },
     });
   }
@@ -39,11 +41,23 @@ export class UsersService {
   findOne(id: number): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { id },
-      relations: ['profile'],
+      relations: {
+        profile:true
+      },
     });
   }
 
-  
+  async uploadAvatar(avatar: Express.Multer.File, userId: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: {
+        profile:true
+      },
+    });
+
+    let avatarUrl = await this.firebaseService.uploadFile(avatar);
+    console.log(avatarUrl)
+  }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     return await this.usersRepository.update(id, updateUserDto);
