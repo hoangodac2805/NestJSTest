@@ -4,19 +4,19 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/database/typeorm/entities/User.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
 import { RefreshToken } from 'src/database/typeorm/entities/Refresh-token.entity';
+import { AuthGuard } from './jwt-auth.guard';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,RefreshToken]),
+    TypeOrmModule.forFeature([User, RefreshToken]),
     JwtModule.register({
-      global:true,
+      global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '15m' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService,JwtStrategy],
-  exports:[AuthService]
+  providers: [AuthService,AuthGuard],
+  exports: [AuthService]
 })
-export class AuthModule {}
+export class AuthModule { }

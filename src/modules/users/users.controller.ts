@@ -61,7 +61,7 @@ export class UsersController {
   }
 
 
-  @Post('upload')
+  @Post('uploadAvatar')
   @UseInterceptors(FileInterceptor('avatar', {
     limits: { fileSize: 1 * 1024 * 1024 },
   }))

@@ -55,7 +55,9 @@ export class User {
   @JoinColumn()
   profile: Profile;
 
-  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    cascade: true
+  })
   refreshTokens: RefreshToken[];
 
   @CreateDateColumn()
